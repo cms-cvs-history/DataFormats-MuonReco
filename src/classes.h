@@ -3,6 +3,7 @@
 #include "DataFormats/MuonReco/interface/MuonIsolation.h"
 #include "DataFormats/MuonReco/interface/MuonTrackLinks.h"
 #include "DataFormats/MuonReco/interface/Direction.h"
+#include "DataFormats/MuonReco/interface/MuIsoDepositFwd.h"
 #include "DataFormats/MuonReco/interface/MuIsoDeposit.h"
 #include "DataFormats/Common/interface/AssociationMap.h"
 #include <vector>
@@ -52,5 +53,10 @@ namespace {
     edm::reftobase::RefHolder<reco::MuonRef> hcc2;
     edm::reftobase::VectorHolder<reco::Candidate, reco::MuonRefVector> hcc3;
     edm::reftobase::RefVectorHolder<reco::MuonRefVector> hcc4;
+
+    reco::CandIsoDepositAssociationPair candIsoAP;
+    reco::CandIsoDepositAssociationVector candIsoAV;
+    std::vector<reco::CandIsoDepositAssociationVector> candIsoAPV_root_seems_to_need_this;
+    edm::Wrapper<reco::CandIsoDepositAssociationVector> candIsoAV_w;
   }
 }
