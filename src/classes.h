@@ -58,5 +58,8 @@ namespace {
     reco::CandIsoDepositAssociationVector candIsoAV;
     std::vector<reco::CandIsoDepositAssociationVector> candIsoAPV_root_seems_to_need_this;
     edm::Wrapper<reco::CandIsoDepositAssociationVector> candIsoAV_w;
+
+    reco::IsoDepositMap idvm;
+    edm::Wrapper<reco::IsoDepositMap> w_idvm;
   }
 }

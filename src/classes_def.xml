@@ -53,5 +53,8 @@
   <class name="reco::CandIsoDepositAssociationPair" /> 
   <class name="std::vector<reco::CandIsoDepositAssociationPair>" /> 
 
+  <class name="reco::IsoDepositMap"/>
+  <class name="edm::Wrapper<reco::IsoDepositMap>"/>
+
 </lcgdict>
 
