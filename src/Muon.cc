@@ -20,10 +20,11 @@ Muon::Muon() {
 bool Muon::overlap( const Candidate & c ) const {
   const RecoCandidate * o = dynamic_cast<const RecoCandidate *>( & c );
   return ( o != 0 && 
-	   ( checkOverlap( track(), o->track() ) ||
-	     checkOverlap( standAloneMuon(), o->standAloneMuon() ) ||
-	     checkOverlap( combinedMuon(), o->combinedMuon() ) ||
-	     checkOverlap( superCluster(), o->superCluster() ) ) 
+	      ( checkOverlap( track(), o->track() ) ||
+		checkOverlap( standAloneMuon(), o->standAloneMuon() ) ||
+		checkOverlap( combinedMuon(), o->combinedMuon() ) ||
+		checkOverlap( standAloneMuon(), o->track() ) ||
+		checkOverlap( combinedMuon(), o->track() ) )
 	   );
 }
 
