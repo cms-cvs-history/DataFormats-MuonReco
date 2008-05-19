@@ -10,7 +10,7 @@
  *
  * \author Luca Lista, Claudio Campagnari, Dmytro Kovalskyi, Jake Ribnik
  *
- * \version $Id: Muon.h,v 1.37 2007/10/06 00:26:25 dmytro Exp $
+ * \version $Id: Muon.h,v 1.34.4.1 2008/01/10 01:31:12 dmytro Exp $
  *
  */
 #include "DataFormats/RecoCandidate/interface/RecoCandidate.h"
@@ -103,6 +103,25 @@ namespace reco {
     bool isStandAloneMuon() const { return getType() & StandAloneMuon; }
     bool isCaloMuon() const { return getType() & CaloMuon; }
     
+    /// ====================== SELECTOR BLOCK ===========================
+    ///
+    /// simple muon selection based on stored information inside the muon
+    /// object
+    enum SelectionType {
+         All,                      // dummy options - always true
+         AllGlobalMuons,           // checks isGlobalMuon flag
+         AllStandAloneMuons,       // checks isStandAloneMuon flag
+         AllTrackerMuons,          // checks isTrackerMuon flag
+	 TrackerMuonArbitrated,    // resolve ambiguity of sharing segments
+         AllArbitrated,            // all muons with the tracker muon arbitrated
+         GlobalMuonPromptTight,    // global muons with tighter fit requirements
+	 TMLastStationLoose,       // penetration depth loose selector
+	 TMLastStationTight,       // penetration depth tight selector
+	 TM2DCompatibilityLoose,   // likelihood based loose selector
+	 TM2DCompatibilityTight    // likelihood based tight selector
+    };
+    bool isGood( SelectionType type = AllArbitrated ) const;
+     
   private:
     /// check overlap with another candidate
     virtual bool overlap( const Candidate & ) const;
