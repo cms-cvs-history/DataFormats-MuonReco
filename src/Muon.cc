@@ -8,6 +8,7 @@ Muon::Muon(  Charge q, const LorentzVector & p4, const Point & vtx ) :
      energyValid_  = false;
      matchesValid_ = false;
      isolationValid_ = false;
+     qualityValid_ = false;
      caloCompatibility_ = -9999.;
      type_ = 0;
 }
@@ -16,6 +17,7 @@ Muon::Muon() {
    energyValid_  = false;
    matchesValid_ = false;
    isolationValid_ = false;
+   qualityValid_ = false;
    caloCompatibility_ = -9999.;
    type_ = 0;
 }
@@ -81,7 +83,7 @@ unsigned int Muon::stationMask( ArbitrationType type ) const
    {
       if(chamberMatch->segmentMatches.empty()) continue;
       if(type == NoArbitration) {
-         curMask = 1<<(chamberMatch->station()-1)+4*(chamberMatch->detector()-1);
+         curMask = 1<<( (chamberMatch->station()-1)+4*(chamberMatch->detector()-1) );
          // do not double count
          if(!(totMask & curMask))
             totMask += curMask;
@@ -93,7 +95,7 @@ unsigned int Muon::stationMask( ArbitrationType type ) const
       {
          if(type == SegmentArbitration)
             if(segmentMatch->isMask(MuonSegmentMatch::BestInStationByDR)) {
-               curMask = 1<<(chamberMatch->station()-1)+4*(chamberMatch->detector()-1);
+               curMask = 1<<( (chamberMatch->station()-1)+4*(chamberMatch->detector()-1) );
                // do not double count
                if(!(totMask & curMask))
                   totMask += curMask;
@@ -102,7 +104,7 @@ unsigned int Muon::stationMask( ArbitrationType type ) const
          if(type == SegmentAndTrackArbitration)
             if(segmentMatch->isMask(MuonSegmentMatch::BestInStationByDR) &&
                   segmentMatch->isMask(MuonSegmentMatch::BelongsToTrackByDR)) {
-               curMask = 1<<(chamberMatch->station()-1)+4*(chamberMatch->detector()-1);
+               curMask = 1<<( (chamberMatch->station()-1)+4*(chamberMatch->detector()-1) );
                // do not double count
                if(!(totMask & curMask))
                   totMask += curMask;
@@ -110,7 +112,7 @@ unsigned int Muon::stationMask( ArbitrationType type ) const
             }
          if(type > 1<<7)
             if(segmentMatch->isMask(type)) {
-               curMask = 1<<(chamberMatch->station()-1)+4*(chamberMatch->detector()-1);
+               curMask = 1<<( (chamberMatch->station()-1)+4*(chamberMatch->detector()-1) );
                // do not double count
                if(!(totMask & curMask))
                   totMask += curMask;
@@ -145,7 +147,7 @@ unsigned int Muon::stationGapMaskDistance( float distanceCut ) const
             }
             if( ( fabs(edgeX) < fabs(distanceCut) && edgeY < fabs(distanceCut) ) ||
 		( fabs(edgeY) < fabs(distanceCut) && edgeX < fabs(distanceCut) ) ) // inside gap
-               curMask = 1<<(stationIndex-1)+4*(detectorIndex-1);
+               curMask = 1<<( (stationIndex-1)+4*(detectorIndex-1) );
          }
 
          totMask += curMask; // add to total mask
@@ -180,7 +182,7 @@ unsigned int Muon::stationGapMaskPull( float sigmaCut ) const
             }
             if( ( fabs(edgeX/xErr) < fabs(sigmaCut) && edgeY/yErr < fabs(sigmaCut) ) ||
 		( fabs(edgeY/yErr) < fabs(sigmaCut) && edgeX/xErr < fabs(sigmaCut) ) ) // inside gap
-               curMask = 1<<(stationIndex-1)+4*(detectorIndex-1);
+               curMask = 1<<((stationIndex-1)+4*(detectorIndex-1));
          }
 
          totMask += curMask; // add to total mask
