@@ -6,8 +6,8 @@
  *  Set of functions that select among the different track refits
  *  based on the fit quality, in order to achieve optimal resolution.
  *
- *  $Date: 2008/06/13 10:09:41 $
- *  $Revision: 1.1 $
+ *  $Date: 2011/09/21 01:02:50 $
+ *  $Revision: 1.2 $
  *  \author Piotr Traczyk
  */
 
@@ -26,7 +26,7 @@ namespace muon {
 
   // Version for convenience. (NB: can be used with pat::Muon, even
   // with embedded tracks, equally conveniently!)
-  reco::TrackRef tevOptimized(const reco::Muon& muon,
+  inline reco::TrackRef tevOptimized(const reco::Muon& muon,
 			      const double tune1 = 30.,
 			      const double tune2 = 0.) {
     return tevOptimized(muon.globalTrack(),
@@ -44,13 +44,13 @@ namespace muon {
   // are just for backward compatibility and not for new code, we
   // don't bother to expose the tune parameters.
 
-  reco::TrackRef getTevRefitTrack(const reco::TrackRef& combinedTrack,
+  inline reco::TrackRef getTevRefitTrack(const reco::TrackRef& combinedTrack,
 				  const reco::TrackToTrackMap& map) {
     reco::TrackToTrackMap::const_iterator it = map.find(combinedTrack);
     return it == map.end() ? reco::TrackRef() : it->val;
   }
 
-  reco::TrackRef tevOptimized(const reco::TrackRef& combinedTrack,
+  inline reco::TrackRef tevOptimized(const reco::TrackRef& combinedTrack,
 			      const reco::TrackRef& trackerTrack,
 			      const reco::TrackToTrackMap& tevMap1,
 			      const reco::TrackToTrackMap& tevMap2,
@@ -61,7 +61,7 @@ namespace muon {
 			getTevRefitTrack(combinedTrack, tevMap3));
   }
 
-  reco::TrackRef tevOptimized(const reco::Muon& muon,
+  inline reco::TrackRef tevOptimized(const reco::Muon& muon,
 			      const reco::TrackToTrackMap& tevMap1,
 			      const reco::TrackToTrackMap& tevMap2,
 			      const reco::TrackToTrackMap& tevMap3 ) {
@@ -79,7 +79,7 @@ namespace muon {
 				  const reco::TrackToTrackMap tevMap2,
 				  const reco::TrackToTrackMap tevMap3 );
   
-  reco::TrackRef tevOptimizedOld( const reco::Muon& muon,
+  inline reco::TrackRef tevOptimizedOld( const reco::Muon& muon,
 				  const reco::TrackToTrackMap tevMap1,
 				  const reco::TrackToTrackMap tevMap2,
 				  const reco::TrackToTrackMap tevMap3 ) {
@@ -94,7 +94,7 @@ namespace muon {
 			     const double ptThreshold = 200.);
 
   // Convenience version of the above.
-  reco::TrackRef sigmaSwitch(const reco::Muon& muon,
+  inline reco::TrackRef sigmaSwitch(const reco::Muon& muon,
 			     const double nSigma = 2.,
                              const double ptThreshold = 200.) {
     return muon::sigmaSwitch(muon.globalTrack(),
