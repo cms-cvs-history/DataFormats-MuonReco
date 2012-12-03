@@ -9,8 +9,10 @@ reco::TrackRef muon::tevOptimized(const reco::TrackRef& combinedTrack,
 				  const reco::TrackRef& trackerTrack,
 				  const reco::TrackRef& tpfmsTrack,
 				  const reco::TrackRef& pickyTrack,
+  			          const double ptThreshold,
 				  const double tune1,
-				  const double tune2) {
+				  const double tune2,
+				  double dptcut) {
   // Array for convenience below.
   const reco::TrackRef refit[4] = { 
     trackerTrack, 
@@ -24,11 +26,26 @@ reco::TrackRef muon::tevOptimized(const reco::TrackRef& combinedTrack,
   // the track being not available, whether the (re)fit failed or it's
   // just not in the event, or if the (re)fit ended up with no valid
   // hits.
-  double prob[4] = {0.};
-  for (unsigned int i = 0; i < 4; ++i) 
-    if (refit[i].isNonnull() && refit[i]->numberOfValidHits()) 
-      prob[i] = muon::trackProbability(refit[i]); 
+  double prob[4] = {0.,0.,0.,0.};
+  bool valid[4] = {0,0,0,0};
 
+  double dptmin = 1.;
+
+  if (dptcut>0) {  
+    for (unsigned int i = 0; i < 4; ++i)
+      if (refit[i].isNonnull())
+        if (refit[i]->ptError()/refit[i]->pt()<dptmin) dptmin = refit[i]->ptError()/refit[i]->pt();
+  
+    if (dptmin>dptcut) dptcut = dptmin+0.15;
+  }
+
+  for (unsigned int i = 0; i < 4; ++i) 
+    if (refit[i].isNonnull()){ 
+      valid[i] = true;
+      if (refit[i]->numberOfValidHits() && (refit[i]->ptError()/refit[i]->pt()<dptcut || dptcut<0)) 
+        prob[i] = muon::trackProbability(refit[i]); 
+    }
+  
   //std::cout << "Probabilities: " << prob[0] << " " << prob[1] << " " << prob[2] << " " << prob[3] << std::endl;
 
   // Start with picky.
@@ -37,14 +54,22 @@ reco::TrackRef muon::tevOptimized(const reco::TrackRef& combinedTrack,
   // If there's a problem with picky, make the default one of the
   // other tracks. Try TPFMS first, then global, then tracker-only.
   if (prob[3] == 0.) { 
-    if      (prob[2] > 0.) chosen = 2;
-    else if (prob[1] > 0.) chosen = 1;
-    else if (prob[0] > 0.) chosen = 0;
+
+    // split so that passing dptcut<0 recreates EXACTLY the old tuneP behavior
+    if (dptcut>0) {
+      if      (prob[0] > 0.) chosen = 0;
+      else if (prob[2] > 0.) chosen = 2;
+      else if (prob[1] > 0.) chosen = 1;
+    } else {
+      if      (prob[2] > 0.) chosen = 2;
+      else if (prob[1] > 0.) chosen = 1;
+      else if (prob[0] > 0.) chosen = 0;
+    }
   } 
 
   // Now the algorithm: switch from picky to tracker-only if the
   // difference, log(tail prob(picky)) - log(tail prob(tracker-only))
-  // is greater than a tuned value (currently 30). Then compare the
+  // is greater than a tuned value. Then compare the
   // so-picked track to TPFMS in the same manner using another tuned
   // value.
   if (prob[0] > 0. && prob[3] > 0. && (prob[3] - prob[0]) > tune1)
@@ -52,7 +77,16 @@ reco::TrackRef muon::tevOptimized(const reco::TrackRef& combinedTrack,
   if (prob[2] > 0. && (prob[chosen] - prob[2]) > tune2)
     chosen = 2;
 
-  // Done. Return the chosen track (which can be the global track in
+  // Sanity checks 
+  if (chosen == 3 && !valid[3] ) chosen = 2;
+  if (chosen == 2 && !valid[2] ) chosen = 1;
+  if (chosen == 1 && !valid[1] ) chosen = 0; 
+  
+  // Done. If pT of the chosen track (or pT of the tracker track) is below the threshold value, return the tracker track.
+  if (valid[chosen] && refit[chosen]->pt() < ptThreshold && prob[0] > 0.) return trackerTrack;    
+  if (trackerTrack->pt() < ptThreshold && prob[0] > 0.) return trackerTrack;  
+  
+  // Return the chosen track (which can be the global track in
   // very rare cases).
   return refit[chosen];
 }

@@ -21,20 +21,26 @@ namespace muon {
 			      const reco::TrackRef& trackerTrack,
 			      const reco::TrackRef& tpfmsTrack,
 			      const reco::TrackRef& pickyTrack,
+ 			      const double ptThreshold = 200.,
 			      const double tune1 = 30.,
-			      const double tune2 = 0.);
+			      const double tune2 = 0.,
+			      double dptcut = -1.);
 
   // Version for convenience. (NB: can be used with pat::Muon, even
   // with embedded tracks, equally conveniently!)
   inline reco::TrackRef tevOptimized(const reco::Muon& muon,
+ 			      const double ptThreshold = 200.,
 			      const double tune1 = 30.,
-			      const double tune2 = 0.) {
+			      const double tune2 = 0.,
+			      const double dptcut = -1.) {
     return tevOptimized(muon.globalTrack(),
 			muon.innerTrack(),
 			muon.tpfmsTrack(),
 			muon.pickyTrack(),
+			ptThreshold,
 			tune1,
-			tune2);
+			tune2,
+			dptcut);
   }
 
   // The next two versions of tevOptimized are for backward
