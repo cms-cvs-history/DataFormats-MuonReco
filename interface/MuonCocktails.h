@@ -6,8 +6,8 @@
  *  Set of functions that select among the different track refits
  *  based on the fit quality, in order to achieve optimal resolution.
  *
- *  $Date: 2011/09/21 01:02:50 $
- *  $Revision: 1.2 $
+ *  $Date: 2012/12/03 10:42:59 $
+ *  $Revision: 1.2.2.2 $
  *  \author Piotr Traczyk
  */
 
@@ -17,7 +17,7 @@
 
 namespace muon {
 
-  reco::TrackRef tevOptimized(const reco::TrackRef& combinedTrack,
+  std::pair<reco::TrackRef,int> tevOptimized(const reco::TrackRef& combinedTrack,
 			      const reco::TrackRef& trackerTrack,
 			      const reco::TrackRef& tpfmsTrack,
 			      const reco::TrackRef& pickyTrack,
@@ -28,7 +28,7 @@ namespace muon {
 
   // Version for convenience. (NB: can be used with pat::Muon, even
   // with embedded tracks, equally conveniently!)
-  inline reco::TrackRef tevOptimized(const reco::Muon& muon,
+  inline std::pair<reco::TrackRef,int> tevOptimized(const reco::Muon& muon,
  			      const double ptThreshold = 200.,
 			      const double tune1 = 30.,
 			      const double tune2 = 0.,
@@ -56,7 +56,7 @@ namespace muon {
     return it == map.end() ? reco::TrackRef() : it->val;
   }
 
-  inline reco::TrackRef tevOptimized(const reco::TrackRef& combinedTrack,
+  inline std::pair<reco::TrackRef,int> tevOptimized(const reco::TrackRef& combinedTrack,
 			      const reco::TrackRef& trackerTrack,
 			      const reco::TrackToTrackMap& tevMap1,
 			      const reco::TrackToTrackMap& tevMap2,
@@ -67,7 +67,7 @@ namespace muon {
 			getTevRefitTrack(combinedTrack, tevMap3));
   }
 
-  inline reco::TrackRef tevOptimized(const reco::Muon& muon,
+  inline std::pair<reco::TrackRef,int> tevOptimized(const reco::Muon& muon,
 			      const reco::TrackToTrackMap& tevMap1,
 			      const reco::TrackToTrackMap& tevMap2,
 			      const reco::TrackToTrackMap& tevMap3 ) {

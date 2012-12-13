@@ -5,7 +5,7 @@
 //
 // Return the TeV-optimized refit track, aka the cocktail or Tune P.
 //
-reco::TrackRef muon::tevOptimized(const reco::TrackRef& combinedTrack,
+std::pair<reco::TrackRef,int> muon::tevOptimized(const reco::TrackRef& combinedTrack,
 				  const reco::TrackRef& trackerTrack,
 				  const reco::TrackRef& tpfmsTrack,
 				  const reco::TrackRef& pickyTrack,
@@ -83,12 +83,12 @@ reco::TrackRef muon::tevOptimized(const reco::TrackRef& combinedTrack,
   if (chosen == 1 && !valid[1] ) chosen = 0; 
   
   // Done. If pT of the chosen track (or pT of the tracker track) is below the threshold value, return the tracker track.
-  if (valid[chosen] && refit[chosen]->pt() < ptThreshold && prob[0] > 0.) return trackerTrack;    
-  if (trackerTrack->pt() < ptThreshold && prob[0] > 0.) return trackerTrack;  
+  if (valid[chosen] && refit[chosen]->pt() < ptThreshold && prob[0] > 0.) return std::make_pair(trackerTrack,0);    
+  if (trackerTrack->pt() < ptThreshold && prob[0] > 0.) return std::make_pair(trackerTrack,0);  
   
   // Return the chosen track (which can be the global track in
   // very rare cases).
-  return refit[chosen];
+  return std::make_pair(refit[chosen],chosen);
 }
 
 //
