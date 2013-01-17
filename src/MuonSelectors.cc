@@ -722,6 +722,22 @@ bool muon::isTightMuon(const reco::Muon& muon, const reco::Vertex& vtx){
 }
 
 
+bool muon::isTightMuonLayer(const reco::Muon& muon, const reco::Vertex& vtx){
+
+  if(!muon.isTrackerMuon() || !muon.isGlobalMuon()) return false;
+  
+  bool muID = isGoodMuon(muon,GlobalMuonPromptTight) && isGoodMuon(muon,TrackerMuonArbitrated);
+  
+  bool hits = muon.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 8 &&
+    muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+    muon.numberOfMatchedStations() > 1;
+  
+  bool ip = fabs(muon.innerTrack()->dxy(vtx.position())) < 0.2;
+  
+  return muID && hits && ip;
+}
+
+
 bool muon::isSoftMuon(const reco::Muon& muon, const reco::Vertex& vtx){
 
   bool muID = muon::isGoodMuon(muon, TMOneStationTight);
@@ -738,18 +754,3 @@ bool muon::isSoftMuon(const reco::Muon& muon, const reco::Vertex& vtx){
   return muID && hits && ip && chi2 ;
 }
 
-
-
-bool muon::isHighPtMuon(const reco::Muon& muon, const reco::Vertex& vtx){
-  
-  if(!muon.isGlobalMuon()) return false;
-  
-  bool muID = isGoodMuon(muon,TrackerMuonArbitrated);
-  
-  bool hits = muon.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 8 &&
-    muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
-    muon.numberOfMatchedStations() > 1 && 
-    muon.globalTrack()->hitPattern().numberOfValidMuonHits() > 0;
-  
-  return muID && hits;
-}
