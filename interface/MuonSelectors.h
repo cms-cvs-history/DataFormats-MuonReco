@@ -5,7 +5,7 @@
 // 
 //
 // Original Author:  Jake Ribnik, Dmytro Kovalskyi
-// $Id: MuonSelectors.h,v 1.13 2010/06/28 08:06:37 dmytro Exp $
+// $Id: MuonSelectors.h,v 1.14 2011/10/27 16:28:00 bellan Exp $
 
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "TMath.h"
@@ -81,7 +81,10 @@ namespace muon {
 		    bool   syncMinNMatchesNRequiredStationsInBarrelOnly = true,//this is what we had originally
 		    bool   applyAlsoAngularCuts = false);
 
-   bool isTightMuon(const reco::Muon&, const reco::Vertex&);
+   bool isTightMuon (const reco::Muon& muon, const reco::Vertex& vtx);
+   bool isSoftMuon  (const reco::Muon& muon, const reco::Vertex& vtx);
+   bool isHighPtMuon(const reco::Muon& muon, const reco::Vertex& vtx);
+
    
    // determine if station was crossed well withing active volume
    unsigned int RequiredStationMask( const reco::Muon& muon,

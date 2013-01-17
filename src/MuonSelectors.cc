@@ -708,14 +708,48 @@ bool muon::overlap( const reco::Muon& muon1, const reco::Muon& muon2,
 
 bool muon::isTightMuon(const reco::Muon& muon, const reco::Vertex& vtx){
 
+  if(!muon.isTrackerMuon() || !muon.isGlobalMuon()) return false;
+  
   bool muID = isGoodMuon(muon,GlobalMuonPromptTight) && isGoodMuon(muon,TrackerMuonArbitrated);
   
   bool hits = muon.innerTrack()->numberOfValidHits() > 10 &&
     muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
     muon.numberOfMatchedStations() > 1;
   
-  // FIXME: to be made consistent
   bool ip = fabs(muon.innerTrack()->dxy(vtx.position())) < 0.2;
   
   return muID && hits && ip;
+}
+
+
+bool muon::isSoftMuon(const reco::Muon& muon, const reco::Vertex& vtx){
+
+  bool muID = muon::isGoodMuon(muon, TMOneStationTight);
+
+  if(!muID) return false;
+  
+  bool hits = muon.innerTrack()->hitPattern().numberOfValidTrackerHits() > 10  &&
+    muon.innerTrack()->hitPattern().pixelLayersWithMeasurement() > 1;
+
+  bool chi2 = muon.innerTrack()->normalizedChi2() < 1.8;  
+  
+  bool ip = fabs(muon.innerTrack()->dxy(vtx.position())) < 3. && fabs(muon.innerTrack()->dz(vtx.position())) < 30.;
+  
+  return muID && hits && ip && chi2 ;
+}
+
+
+
+bool muon::isHighPtMuon(const reco::Muon& muon, const reco::Vertex& vtx){
+  
+  if(!muon.isGlobalMuon()) return false;
+  
+  bool muID = isGoodMuon(muon,TrackerMuonArbitrated);
+  
+  bool hits = muon.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 8 &&
+    muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+    muon.numberOfMatchedStations() > 1 && 
+    muon.globalTrack()->hitPattern().numberOfValidMuonHits() > 0;
+  
+  return muID && hits;
 }
