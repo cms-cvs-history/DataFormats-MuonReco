@@ -5,11 +5,13 @@
 // 
 //
 // Original Author:  Jake Ribnik, Dmytro Kovalskyi
-// $Id: MuonSelectors.h,v 1.12 2010/04/26 00:36:16 dmytro Exp $
+// $Id: MuonSelectors.h,v 1.14.6.1 2013/01/17 11:12:38 bellan Exp $
 
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "TMath.h"
 #include <string>
+
+namespace reco{class Vertex;}
 
 namespace muon {
    /// Selector type
@@ -78,6 +80,13 @@ namespace muon {
 		    reco::Muon::ArbitrationType arbitrationType,
 		    bool   syncMinNMatchesNRequiredStationsInBarrelOnly = true,//this is what we had originally
 		    bool   applyAlsoAngularCuts = false);
+
+   bool isTightMuon (const reco::Muon& muon, const reco::Vertex& vtx);
+
+   // uses cut on number of layers (like for 2012 recipe) instead on number of hits
+   bool isTightMuonLayer(const reco::Muon& muon, const reco::Vertex& vtx);
+   bool isSoftMuon  (const reco::Muon& muon, const reco::Vertex& vtx);
+
    
    // determine if station was crossed well withing active volume
    unsigned int RequiredStationMask( const reco::Muon& muon,
