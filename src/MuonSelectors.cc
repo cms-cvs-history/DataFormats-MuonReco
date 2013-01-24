@@ -2,6 +2,7 @@
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/MuonDetId/interface/MuonSubdetId.h"
 #include "DataFormats/MuonDetId/interface/CSCDetId.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
 
 namespace muon {
 SelectionType selectionTypeFromString( const std::string &label )
@@ -702,4 +703,82 @@ bool muon::overlap( const reco::Muon& muon1, const reco::Muon& muon2,
 	}
       }
   return false;
+}
+
+
+bool muon::isTightMuon(const reco::Muon& muon, const reco::Vertex& vtx){
+
+  if(!muon.isTrackerMuon() || !muon.isGlobalMuon()) return false;
+  
+  bool muID = isGoodMuon(muon,GlobalMuonPromptTight) && isGoodMuon(muon,TrackerMuonArbitrated);
+  
+  bool hits = muon.innerTrack()->numberOfValidHits() > 10 &&
+    muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+    muon.numberOfMatchedStations() > 1;
+  
+  bool ip = fabs(muon.innerTrack()->dxy(vtx.position())) < 0.2;
+  
+  return muID && hits && ip;
+}
+
+
+bool muon::isTightMuonLayer(const reco::Muon& muon, const reco::Vertex& vtx){
+
+  if(!muon.isTrackerMuon() || !muon.isGlobalMuon()) return false;
+  
+  bool muID = isGoodMuon(muon,GlobalMuonPromptTight) && isGoodMuon(muon,TrackerMuonArbitrated);
+  
+  bool hits = muon.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 8 &&
+    muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+    muon.numberOfMatchedStations() > 1;
+  
+  bool ip = fabs(muon.innerTrack()->dxy(vtx.position())) < 0.2;
+  
+  return muID && hits && ip;
+}
+
+
+bool muon::isSoftMuon(const reco::Muon& muon, const reco::Vertex& vtx){
+
+  bool muID = muon::isGoodMuon(muon, TMOneStationTight);
+
+  if(!muID) return false;
+  
+  bool hits = muon.innerTrack()->hitPattern().numberOfValidTrackerHits() > 10  &&
+    muon.innerTrack()->hitPattern().pixelLayersWithMeasurement() > 1;
+
+  bool chi2 = muon.innerTrack()->normalizedChi2() < 1.8;  
+  
+  bool ip = fabs(muon.innerTrack()->dxy(vtx.position())) < 3. && fabs(muon.innerTrack()->dz(vtx.position())) < 30.;
+  
+  return muID && hits && ip && chi2 ;
+}
+
+int muon::sharedSegments( const reco::Muon& mu, const reco::Muon& mu2, unsigned int segmentArbitrationMask ) {
+    int ret = 0;
+   
+    // Will do with a stupid double loop, since creating and filling a map is probably _more_ inefficient for a single lookup.
+    for(std::vector<reco::MuonChamberMatch>::const_iterator chamberMatch = mu.matches().begin();
+        chamberMatch != mu.matches().end(); ++chamberMatch) {
+        if (chamberMatch->segmentMatches.empty()) continue;
+        for(std::vector<reco::MuonChamberMatch>::const_iterator chamberMatch2 = mu2.matches().begin();
+            chamberMatch2 != mu2.matches().end(); ++chamberMatch2) {
+            if (chamberMatch2->segmentMatches.empty()) continue;
+            if (chamberMatch2->id() != chamberMatch->id()) continue;
+            for(std::vector<reco::MuonSegmentMatch>::const_iterator segmentMatch = chamberMatch->segmentMatches.begin(); 
+                segmentMatch != chamberMatch->segmentMatches.end(); ++segmentMatch) {
+                if (!segmentMatch->isMask(segmentArbitrationMask)) continue;
+                for(std::vector<reco::MuonSegmentMatch>::const_iterator segmentMatch2 = chamberMatch2->segmentMatches.begin(); 
+                    segmentMatch2 != chamberMatch2->segmentMatches.end(); ++segmentMatch2) {
+                    if (!segmentMatch2->isMask(segmentArbitrationMask)) continue;
+                    if ((segmentMatch->cscSegmentRef.isNonnull() && segmentMatch->cscSegmentRef == segmentMatch2->cscSegmentRef) ||
+                        (segmentMatch-> dtSegmentRef.isNonnull() && segmentMatch-> dtSegmentRef == segmentMatch2-> dtSegmentRef) ) {
+                        ++ret;
+                    } // is the same
+                } // segment of mu2 in chamber
+            } // segment of mu1 in chamber
+        } // chamber of mu2
+    } // chamber of mu1
+  
+    return ret; 
 }
