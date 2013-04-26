@@ -5,7 +5,7 @@
 // 
 //
 // Original Author:  Jake Ribnik, Dmytro Kovalskyi
-// $Id: MuonSelectors.h,v 1.14 2011/10/27 16:28:00 bellan Exp $
+// $Id: MuonSelectors.h,v 1.14.2.1 2012/09/24 21:11:53 gpetrucc Exp $
 
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "TMath.h"
@@ -82,7 +82,12 @@ namespace muon {
 		    bool   applyAlsoAngularCuts = false);
 
    bool isTightMuon(const reco::Muon&, const reco::Vertex&);
-   
+   bool isLooseMuon(const reco::Muon&);
+   bool isSoftMuon(const reco::Muon&, const reco::Vertex&);
+   enum TunePType{defaultTuneP, improvedTuneP};
+   bool isHighPtMuon(const reco::Muon&, const reco::Vertex&, TunePType = muon::improvedTuneP);
+   reco::TrackRef improvedMuonBestTrack(const reco::Muon&, TunePType);
+
    // determine if station was crossed well withing active volume
    unsigned int RequiredStationMask( const reco::Muon& muon,
 				     double maxChamberDist,
