@@ -753,11 +753,6 @@ bool muon::isHighPtMuon(const reco::Muon& muon, const reco::Vertex& vtx, TunePTy
     bool momQuality = cktTrack->ptError()/cktTrack->pt() < 0.3;
 
 
-    if(muon.innerTrack().isNull())
-      return false;
-
-
-
     bool hits = muon.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5 && muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0;
 
 
